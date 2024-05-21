@@ -11,37 +11,27 @@ namespace Roga_Simple_Program
 {
     public class CsvDataAnalyzer
     {
-        public static double GetAvgAgeFromCsv(string filePath)
+        public static void AnalyzeCsv(string filePath)
         {
             using (var reader = new StreamReader(filePath))
             using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 csvReader.Context.RegisterClassMap<PersonMap>();
-                var records = csvReader.GetRecords<Person>();
-                return records.Average(person => person.Age);
+                var people = csvReader.GetRecords<Person>().ToList();
+
+                //find me the average age of all people.
+                var averageAge = people.Average(person => person.Age);
+                Console.WriteLine($"Average age of all people: {averageAge}");
+
+                //find me the total number of people weighing between 120lbs and 140lbs 
+                int countPeople = people.Count(person => person.Weight >= 120 && person.Weight <= 140);
+                Console.WriteLine($"Total number of people weighing between 120lbs and 140lbs: {countPeople}");
+
+                //find me the average age of the people  weighing between 120lbs and 140lbs 
+                double averageAge120To140 = people.Where(person => person.Weight >= 120 && person.Weight <= 140).Average(person => person.Age);
+                Console.WriteLine($"Average age of people weighing between 120lbs and 140lbs: {averageAge120To140}");
             }
         }
 
-        public static int GetTotalBetweenWeightsFromCsv(string filePath, double minWeight, double maxWeight)
-        {
-            using (var reader = new StreamReader(filePath))
-            using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                csvReader.Context.RegisterClassMap<PersonMap>();
-                var records = csvReader.GetRecords<Person>();
-                return records.Count(person => person.Weight >= minWeight && person.Weight <= maxWeight);
-            }
-        }
-
-        public static double GetAvgAgeBetweenWeightsFromCsv(string filePath, double minWeight, double maxWeight)
-        {
-            using (var reader = new StreamReader(filePath))
-            using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                csvReader.Context.RegisterClassMap<PersonMap>();
-                var records = csvReader.GetRecords<Person>().Where(person => person.Weight >= minWeight && person.Weight <= maxWeight);
-                return records.Any() ? records.Average(person => person.Age) : 0;
-            }
-        }
     }
 }

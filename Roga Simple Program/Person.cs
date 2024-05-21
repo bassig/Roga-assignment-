@@ -10,8 +10,8 @@ namespace Roga_Simple_Program
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public Double Age { get; set; }
-        public Double Weight { get; set; }
+        public int Age { get; set; }
+        public decimal Weight { get; set; }
         public Gender Gender { get; set; }
 
     }

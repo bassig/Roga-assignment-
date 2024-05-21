@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Bogus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,45 +10,22 @@ namespace Roga_Simple_Program
 {
     public class CSVGenerator
     {
-        
-        public static void generateCsvFile()
+
+        public static void GenerateCsvFile()
         {
-            List<Person> people = new List<Person>();
+            var userFaker = new Faker<Person>()
+                .RuleFor(u => u.FirstName, f => f.Name.FirstName())
+                .RuleFor(u => u.LastName, f => f.Name.LastName())
+                .RuleFor(u => u.Age, f => f.Random.Number(18,71))
+                .RuleFor(u => u.Weight, f => f.Random.Decimal(95,210))
+                .RuleFor(u => u.Gender, f => f.PickRandom<Gender>());
 
-            Random random = new Random();
+            var users = userFaker.Generate(1000);
 
-            for (int i= 0; i < 1000; i++)
-            {
-                Person person = new Person
-                {
-                    FirstName = GenerateRandomFirstName(),
-                    LastName = GenerateRandomLastName(),
-                    Age = random.Next(18, 71),
-                    Weight = Math.Round(random.NextDouble() * (300 - 100) + 100, 1),
-                    Gender = (Gender)random.Next(Enum.GetValues(typeof(Gender)).Length)
-                };
-
-                people.Add(person);
-            }
-            writeToCsv(people);
+            WriteToCsv(users);
         }
 
-        static string GenerateRandomFirstName() {
-            string firstNamesjson = File.ReadAllText("namesJsons/first.names.json");
-            List<string> firstNames = JsonConvert.DeserializeObject<List<string>>(firstNamesjson);
-            Random random = new Random();
-            return firstNames[random.Next(firstNames.Count)];
-        }
-
-        static string GenerateRandomLastName()
-        {
-            string lastNamesjson = File.ReadAllText("namesJsons/last.names.json");
-            List<string> lastNames = JsonConvert.DeserializeObject<List<string>>(lastNamesjson);
-            Random random = new Random();
-            return lastNames[random.Next(lastNames.Count)];
-        }
-
-        public static void writeToCsv(List<Person> people)
+        public static void WriteToCsv(List<Person> people)
         {
             string rootDirectoryPath = AppDomain.CurrentDomain.BaseDirectory;
             string filePath = Path.Combine(rootDirectoryPath, "people_data.csv");
